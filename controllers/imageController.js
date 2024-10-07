@@ -32,4 +32,23 @@ async function postImage(req, res) {
   }
 }
 
-module.exports = { postImage };
+async function deleteImage(req, res) {
+  try {
+    const blobName = req.params.blobName;
+    if (!blobName) {
+      return res.status(400).send("No blob name provided.");
+    }
+
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+    await blockBlobClient.delete();
+
+    return res.status(200).send({ message: "Image deleted successfully!" });
+  } catch (error) {
+    console.error("Error deleting from Azure Blob Storage:", error);
+    return res.status(500).send("Error deleting file.");
+  }
+}
+
+module.exports = { postImage, deleteImage };
